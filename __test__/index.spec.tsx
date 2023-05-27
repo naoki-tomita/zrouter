@@ -1,61 +1,61 @@
-import { h, Component } from "zheleznaya";
-import { findRoute, Route, getParams } from "../index";
+import { HashStrategy, PathStrategy, extractPathParam, match, createRouter } from "../Router";
 
-describe("#findRoute", () => {
-  it("should be find simple route.", () => {
-    const path = "/foo/bar";
-    const Comp: Component = () => <div />;
-    const routes: Route[] = [["/foo/bar", Comp]];
-    const actual = findRoute(routes, path);
-
-    expect(actual).toEqual(routes[0]);
+describe("HashStrategy", () => {
+  it("should be get hash", () => {
+    const actual = HashStrategy("/foo/bar");
+    expect(actual).toBe("#/foo/bar");
   });
+});
 
-  it("should be find simple route but more nested.", () => {
-    const path = "/foo/bar";
-    const Comp: Component = () => <div />;
-    const routes: Route[] = [["/foo/bar/hoge", Comp]];
-    const actual = findRoute(routes, path);
+describe("PathStrategy", () => {
+  it("should be get path", () => {
+    const actual = PathStrategy("/foo/bar");
+    expect(actual).toBe("/foo/bar");
+  })
+});
 
-    expect(actual).toEqual(undefined);
-  });
-
-  it("should be find route includes path parameter.", () => {
-    const path = "/foo/bar";
-    const Comp: Component = () => <div />;
-    const routes: Route[] = [["/foo/:param", Comp]];
-    const actual = findRoute(routes, path);
-
-    expect(actual).toEqual(routes[0]);
-  });
-
-  it("should be find route. variation test1.", () => {
-    const path = "/foo/bar/hoge";
-    const Comp: Component = () => <div />;
-    const routes: Route[] = [["/foo/:param/hoge", Comp]];
-    const actual = findRoute(routes, path);
-
-    expect(actual).toEqual(routes[0]);
-  });
-
-  it("should be find route. variation test1.", () => {
-    const path = "/foo/bar/hoge";
-    const Comp: Component = () => <div />;
-    const routes: Route[] = [["/foo/bar", Comp]];
-    const actual = findRoute(routes, path);
-
-    expect(actual).toEqual(undefined);
-  });
-})
-
-describe("#getParams", () => {
+describe("match", () => {
   const tests = [
-    { path: "/foo/bar", route: "/foo/bar", expected: {} },
-    { path: "/foo/bar", route: "/foo/:id", expected: {id: "bar"} },
-    { path: "/foo/bar/hoge", route: "/foo/:id/:name", expected: {id: "bar", name: "hoge"} }
+    {
+      realPath: ["foo", "bar", "hoge"],
+      definedPath: ["foo", "bar", "hoge"],
+      expected: true,
+    },
+    {
+      realPath: ["foo", "bar", "hoge"],
+      definedPath: ["foo", ":id", "hoge"],
+      expected: true,
+    },
+    {
+      realPath: ["foo", "bar", "hoge"],
+      definedPath: ["foo", "hoge"],
+      expected: false,
+    },
+    {
+      realPath: ["foo", "bar", "hoge"],
+      definedPath: ["foo", "foo", "hoge"],
+      expected: false,
+    },
   ]
+  it.each(tests)("should match path", ({ realPath, definedPath, expected }) => {
+    expect(match(realPath, definedPath)).toBe(expected);
+  });
+});
 
-  it.each(tests)("should be get params", ({ path, route, expected }) => {
-    expect(getParams(route, path)).toEqual(expected);
+describe("extractPathParam", () => {
+  const tests = [
+    {
+      realPath: ["foo", "bar", "hoge"],
+      definedPath: ["foo", "bar", "hoge"],
+      expected: {},
+    },
+    {
+      realPath: ["foo", "bar", "hoge"],
+      definedPath: ["foo", ":id", "hoge"],
+      expected: {id: "bar"},
+    }
+  ]
+  it.each(tests)("should extract path params", ({ realPath, definedPath, expected }) => {
+    expect(extractPathParam(realPath, definedPath)).toEqual(expected);
   });
 });

@@ -1,8 +1,16 @@
+declare const React;
 import { h, render, createStore } from "zheleznaya";
-import { init, Link, Router, useLocation } from "./index";
+import { createRouter } from "./Router";
 
-const store = createStore<{ text: string }>({ text: "hello" });
-init(store);
+const store = createStore<{
+  path: string;
+  organization: string;
+}>({
+  path: location.pathname,
+  organization: "naoki-tomita"
+});
+
+const { Router, Link } = createRouter(store);
 
 const Top = () => {
   return (
@@ -18,27 +26,23 @@ const Page = () => {
   );
 }
 
-const Id = () => {
-  const location = useLocation();
+const Id = ({ id }) => {
   return (
-    <h1>{location.params.id}</h1>
+    <h1>{id}</h1>
   );
 }
 
 const App = () => {
-  const location = useLocation();
   return (
     <div>
       <Link href="/">Head</Link>
-      <div>{store.text}</div>
-      <div>URL IS "{location.path}" URL IS</div>
+      <div>URL IS "{store.path}"</div>
       <Router
-        routes={[
-          ["/", () => <Top/>],
-          ["/foo/bar", () => <Page/>],
-          ["/foo/:id/value", () => <Id />]
-        ]}
-        error={() => <Link href="/foo/bar">404 Not Found</Link>}
+        routes={{
+          "/": () => <Top/>,
+          "/foo/bar": () => <Page/>,
+          "/foo/:id/value": ({ id }) => <Id id={id} />,
+        }}
       />
     </div>
   );
