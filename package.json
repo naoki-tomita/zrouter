@@ -1,8 +1,8 @@
 {
   "name": "@kojiro.ueda/zrouter",
   "version": "0.0.3",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "devDependencies": {
     "@swc/core": "^1.3.60",
