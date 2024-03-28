@@ -51,11 +51,17 @@ export function createRouter(store, strategy = PathStrategy) {
         history.pushState(_path, "", _path);
         callbacks.forEach(it => it());
     }
+    function replace(path) {
+        const _path = strategy(path);
+        store.path = _path;
+        history.replaceState(_path, "", _path);
+        callbacks.forEach(it => it());
+    }
     window.onpopstate = () => {
         const _path = strategy();
         store.path = _path;
         callbacks.forEach(it => it());
     };
-    return { Router, onRouteChange, href, Link };
+    return { Router, onRouteChange, href, replace, Link };
 }
 //# sourceMappingURL=Router.js.map

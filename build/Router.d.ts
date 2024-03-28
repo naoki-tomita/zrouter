@@ -13,6 +13,7 @@ export declare function createRouter(store: {
     }>;
     onRouteChange: (cb: () => void) => void;
     href: (path?: string) => void;
+    replace: (path: string) => void;
     Link: Component<{
         href: string;
     }>;
