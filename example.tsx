@@ -10,7 +10,7 @@ const store = createStore<{
   organization: "naoki-tomita"
 });
 
-const { Router, Link } = createRouter(store);
+const { Router, Link, href, replace } = createRouter(store);
 
 const Top = () => {
   return (
@@ -22,6 +22,8 @@ const Page = () => {
   return (
     <div>
       foo bar page dayo <Link href="/hoge/fuga">hoge fuga</Link>
+      <button onclick={() => href("/hoge/fuga")}>href hoge fuga</button>
+      <button onclick={() => replace("/hoge/fuga")}>replace hoge fuga</button>
     </div>
   );
 }
