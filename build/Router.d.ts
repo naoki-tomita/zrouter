@@ -11,7 +11,11 @@ export declare function createRouter(store: {
         routes: Record<Path, Component>;
         error?: Component | undefined;
     }>;
-    onRouteChange: (cb: () => void) => void;
+    onRouteChange: (cb: (url: {
+        path: string;
+        query: {};
+        hash: string;
+    }) => void) => void;
     href: (path?: string) => void;
     replace: (path: string) => void;
     Link: Component<{

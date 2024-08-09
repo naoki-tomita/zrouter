@@ -2,7 +2,7 @@ import { Component, h } from "zheleznaya";
 
 type PathResolutionStrategy = (path?: string) => string;
 export function PathStrategy(path?: string) {
-  return path ?? location.pathname;
+  return path ?? location.href.replace(location.origin, "");
 }
 export function HashStrategy(path?: string) {
   return path ? `#${path}` : location.hash.replace("#", "");
@@ -38,7 +38,8 @@ export function createRouter(store: { path: string }, strategy: PathResolutionSt
     routes: Record<Path, Component>;
     error?: Component;
   }> = ({ routes, error }) => {
-    const path = strategy().trim().split("/").filter(Boolean);
+    const currentUrl = new URL(`http://example.com${strategy()}`);
+    const path = currentUrl.pathname.trim().split("/").filter(Boolean);
 
     const [url, Page] = Object.entries(routes)
       .map(([url, Page]) => [url.trim().split("/").filter(Boolean), Page] as const)
@@ -93,7 +94,7 @@ export function createRouter(store: { path: string }, strategy: PathResolutionSt
     callbacks.forEach(it => it(toPathObject(_path)));
   }
 
-  store.path = location.href.replace(location.origin, "");
+  store.path = strategy();
   return { Router, onRouteChange, href, replace, Link };
 }
 
