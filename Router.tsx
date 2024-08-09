@@ -45,7 +45,7 @@ export function createRouter(store: { path: string }, strategy: PathResolutionSt
       .find(([url]) => match(path, url))
       ?? [[], error ?? (() => <h2>404 Not found</h2>)];
 
-      const pathParam = extractPathParam(path, url);
+    const pathParam = extractPathParam(path, url);
     return Page(pathParam, []);
   }
 
@@ -53,31 +53,47 @@ export function createRouter(store: { path: string }, strategy: PathResolutionSt
     return <a href={_href} onclick={() => (href(_href), false)}>{children}</a>
   }
 
-  const callbacks: Array<() => void> = [];
-  function onRouteChange(cb: () => void) {
+  type PathObject = {
+    path: string;
+    query: {};
+    hash: string;
+  };
+  const callbacks: Array<(url: PathObject) => void> = [];
+  function onRouteChange(cb: (url: PathObject) => void) {
     callbacks.push(cb);
+  }
+
+  function toPathObject(path: string): PathObject {
+    const url = new URL(`${location.origin}${path}`);
+    return {
+      path: url.pathname,
+      query: [...url.searchParams.entries()]
+        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {}),
+      hash: url.hash,
+    };
   }
 
   function href(path?: string) {
     const _path = strategy(path)
     store.path = _path;
     history.pushState(_path, "", _path);
-    callbacks.forEach(it => it());
+    callbacks.forEach(it => it(toPathObject(_path)));
   }
 
   function replace(path: string) {
     const _path = strategy(path)
     store.path = _path;
     history.replaceState(_path, "", _path);
-    callbacks.forEach(it => it());
+    callbacks.forEach(it => it(toPathObject(_path)));
   }
 
   window.onpopstate = () => {
     const _path = strategy()
     store.path = _path;
-    callbacks.forEach(it => it());
+    callbacks.forEach(it => it(toPathObject(_path)));
   }
 
+  store.path = location.href.replace(location.origin, "");
   return { Router, onRouteChange, href, replace, Link };
 }
 

@@ -10,18 +10,25 @@ const store = createStore<{
   organization: "naoki-tomita"
 });
 
-const { Router, Link, href, replace } = createRouter(store);
+const { Router, Link, href, replace, onRouteChange } = createRouter(store);
+
+onRouteChange((url) => {
+  console.log(url);
+});
 
 const Top = () => {
   return (
-    <h1>Top</h1>
+    <div id="hoge">
+      <h1>Top</h1>
+      <Link href="/foo/bar">/foo/bar</Link>
+    </div>
   );
 }
 
 const Page = () => {
   return (
     <div>
-      foo bar page dayo <Link href="/hoge/fuga">hoge fuga</Link>
+      <div>foo bar page dayo <Link href="/hoge/fuga">hoge fuga</Link></div>
       <button onclick={() => href("/hoge/fuga")}>href hoge fuga</button>
       <button onclick={() => replace("/hoge/fuga")}>replace hoge fuga</button>
     </div>
